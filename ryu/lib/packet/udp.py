@@ -17,6 +17,7 @@ import struct
 
 from . import packet_base
 from . import packet_utils
+from . import dhcp
 
 
 class udp(packet_base.PacketBase):
@@ -40,6 +41,8 @@ class udp(packet_base.PacketBase):
 
     _PACK_STR = '!HHHH'
     _MIN_LEN = struct.calcsize(_PACK_STR)
+    _DHCP_CLIENT_PORT = 68
+    _DHCP_SERVER_PORT = 67
 
     def __init__(self, src_port=1, dst_port=1, total_length=0, csum=0):
         super(udp, self).__init__()
@@ -53,7 +56,15 @@ class udp(packet_base.PacketBase):
         (src_port, dst_port, total_length, csum) = struct.unpack_from(
             cls._PACK_STR, buf)
         msg = cls(src_port, dst_port, total_length, csum)
-        return msg, None, buf[msg._MIN_LEN:total_length]
+        return msg, cls.get_packet_type(src_port, dst_port), buf[msg._MIN_LEN:total_length]
+
+    @classmethod
+    def get_packet_type(cls, src_port, dst_port):
+        # dhcp packet
+        if (src_port == cls._DHCP_SERVER_PORT and dst_port == cls._DHCP_CLIENT_PORT) or\
+                (src_port == cls._DHCP_CLIENT_PORT and dst_port == cls._DHCP_SERVER_PORT):
+            return cls._TYPES.get('dhcp')
+        return cls._TYPES.get('none')
 
     def serialize(self, payload, prev):
         if self.total_length == 0:
@@ -66,3 +77,8 @@ class udp(packet_base.PacketBase):
             h = struct.pack(udp._PACK_STR, self.src_port, self.dst_port,
                             self.total_length, self.csum)
         return h
+
+udp._TYPES = {
+    'none': None,
+    'dhcp': dhcp.dhcp
+}
