@@ -51,7 +51,7 @@ class Packet(object):
                 proto, cls, rest_data = cls.parser(rest_data)
             except struct.error:
                 break
-            if proto:
+            if proto is not None:
                 self.protocols.append(proto)
         if rest_data:
             self.protocols.append(rest_data)
