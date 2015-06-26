@@ -278,11 +278,15 @@ class options(stringify.StringifyMixin):
 
     def serialize(self):
         seri_opt = addrconv.ipv4.text_to_bin(self.magic_cookie)
+        opts_len = 4 # for matic_cookie
         for opt in self.option_list:
             seri_opt += opt.serialize()
+            opts_len += (opt.length + 2) # tag + length
         seri_opt += binascii.a2b_hex('%x' % DHCP_END_OPT)
+        end_opt_len = 1
         if self.options_len == 0:
-            self.options_len = len(seri_opt)
+            self.options_len = opts_len
+        self.options_len += end_opt_len
         return seri_opt
 
 
