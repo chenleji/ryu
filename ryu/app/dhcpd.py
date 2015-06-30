@@ -374,9 +374,7 @@ class Dhcpd(app_manager.RyuApp):
                     self.offers[src] = offer
             wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
-                fmt = ""
-                for i in options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]:
-                    fmt += "s"
+                fmt = "s" * len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 for i in wanted_opt_set:
                     wanted_opts.append(ord(i))
@@ -434,9 +432,7 @@ class Dhcpd(app_manager.RyuApp):
                 msg_type = dhcp.DHCP_NAK
             wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
-                fmt = ""
-                for i in options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]:
-                    fmt += "s"
+                fmt = "s" * len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 for i in wanted_opt_set:
                     wanted_opts.append(ord(i))
