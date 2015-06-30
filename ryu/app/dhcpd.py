@@ -241,7 +241,7 @@ class Dhcpd(app_manager.RyuApp):
             if self.subnet is None:
                 raise RuntimeError("You must specify a subnet mask or use a pool with a subnet hint")
 
-        self.lease_time = 180  # An hour
+        self.lease_time = 180
         # TODO: Actually make them expire :)
 
         self.offers = {}  # Eth -> IP we offered
