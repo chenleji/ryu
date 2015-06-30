@@ -216,6 +216,7 @@ class Dhcpd(app_manager.RyuApp):
 
     def __init__(self, ip_address="192.168.0.254", router_address=(), dns_address=(), pool=None, subnet=None,
                  install_flow=True):
+        super(Dhcpd, self).__init__()
 
         def fix_addr(addr, backup):
             if addr is None:
@@ -301,13 +302,6 @@ class Dhcpd(app_manager.RyuApp):
         msg = ev.msg
         LOG.debug("packet-in msg %s", msg)
         datapath = msg.datapath
-        if self.br is None:
-            LOG.info("No bridge is set")
-            return
-        if self.br.datapath.id != datapath.id:
-            LOG.info("Unknown bridge %(dpid)s ours %(ours)s",
-                     {"dpid": datapath.id, "ours": self.br.datapath.id})
-            return
         port = msg.match['in_port']
         # NOTE: Ryu packet library can raise various exceptions on a corrupted packet.
         try:
