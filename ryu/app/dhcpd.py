@@ -32,6 +32,7 @@ from ryu.lib import addrconv
 from ryu.lib.addresses import IPAddr, parse_cidr
 from ryu.ofproto import ether
 from ryu.ofproto import inet
+import struct
 
 LOG = logging.getLogger(__name__)
 
@@ -242,7 +243,7 @@ class Dhcpd(app_manager.RyuApp):
             if self.subnet is None:
                 raise RuntimeError("You must specify a subnet mask or use a pool with a subnet hint")
 
-        self.lease_time = 60 * 60  # An hour
+        self.lease_time = 180  # An hour
         # TODO: Actually make them expire :)
 
         self.offers = {}  # Eth -> IP we offered
@@ -376,9 +377,14 @@ class Dhcpd(app_manager.RyuApp):
                             offer = wanted_ip
                     pool.remove(offer)
                     self.offers[src] = offer
-            wanted_opts = set()
+            wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
-                wanted_opts.update(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
+                fmt = ""
+                for i in len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]):
+                    fmt += "s"
+                wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
+                for i in wanted_opt_set:
+                    wanted_opts.append(ord(i))
             # DHCP options tag code
             option_list = list()
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
@@ -431,9 +437,14 @@ class Dhcpd(app_manager.RyuApp):
             if got_ip is None:
                 LOG.warn("%s asked for un-offered %s", src, wanted_ip)
                 msg_type = dhcp.DHCP_NAK
-            wanted_opts = set()
+            wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
-                wanted_opts.update(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
+                fmt = ""
+                for i in len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]):
+                    fmt += "s"
+                wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
+                for i in wanted_opt_set:
+                    wanted_opts.append(ord(i))
             # DHCP options tag code
             option_list = list()
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
