@@ -388,23 +388,24 @@ class Dhcpd(app_manager.RyuApp):
             # DHCP options tag code
             option_list = list()
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
-            if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
-                option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
-                                               addrconv.ipv4.text_to_bin(self.subnet.toStr()),
+            if msg_type is not dhcp.DHCP_NAK:
+                if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
+                    option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.subnet.toStr()),
+                                                   length=4))
+                if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
+                    option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
+                                                   length=4))
+                if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
+                    option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
+                                                   length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
+                                               chr(self.lease_time),
                                                length=4))
-            if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
-                option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
-                                               length=4))
-            if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
-                option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
-                                               length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
-                                           chr(self.lease_time),
-                                           length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_RENEWAL_TIME_OPT, chr(self.lease_time / 2), length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_RENEWAL_TIME_OPT, chr(self.lease_time / 2), length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
             resp_options = dhcp.options(option_list=option_list)
             pkt.add_protocol(dhcp.dhcp(op=self._MSG_TYPE_BOOT_REPLY, chaddr=pkt_dhcp.chaddr, options=resp_options,
                                        xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=offer.toStr(),
@@ -412,7 +413,7 @@ class Dhcpd(app_manager.RyuApp):
 
         # REQUEST MSG
         if dhcp_msg_type == dhcp.DHCP_REQUEST:
-            msg_type = dhcp.DHCP_OFFER
+            msg_type = dhcp.DHCP_ACK
             if dhcp.DHCP_REQUESTED_IP_ADDR_OPT not in options:
                 return
             wanted_ip = IPAddr(addrconv.ipv4.bin_to_text(options[dhcp.DHCP_REQUESTED_IP_ADDR_OPT]))
@@ -428,8 +429,8 @@ class Dhcpd(app_manager.RyuApp):
                     if wanted_ip != self.offers[src]:
                         pool.append(self.offers[src])
                         del self.offers[src]
-                else:
-                    got_ip = self.offers[src]
+                    else:
+                        got_ip = self.offers[src]
             if got_ip is None:
                 if wanted_ip in pool:
                     pool.remove(wanted_ip)
@@ -448,23 +449,24 @@ class Dhcpd(app_manager.RyuApp):
             # DHCP options tag code
             option_list = list()
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
-            if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
-                option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
-                                               addrconv.ipv4.text_to_bin(self.subnet.toStr()),
+            if msg_type is not dhcp.DHCP_NAK:
+                if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
+                    option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.subnet.toStr()),
+                                                   length=4))
+                if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
+                    option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
+                                                   length=4))
+                if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
+                    option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
+                                                   addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
+                                                   length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
+                                               chr(self.lease_time),
                                                length=4))
-            if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
-                option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
-                                               length=4))
-            if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
-                option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
-                                               length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
-                                           chr(self.lease_time),
-                                           length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_RENEWAL_TIME_OPT, chr(self.lease_time / 2), length=4))
-            option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_RENEWAL_TIME_OPT, chr(self.lease_time / 2), length=4))
+                option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
             resp_options = dhcp.options(option_list=option_list)
             pkt.add_protocol(dhcp.dhcp(op=self._MSG_TYPE_BOOT_REPLY, chaddr=pkt_dhcp.chaddr, options=resp_options,
                                        xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=wanted_ip.toStr(),
