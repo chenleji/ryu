@@ -380,7 +380,7 @@ class Dhcpd(app_manager.RyuApp):
             wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
                 fmt = ""
-                for i in len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]):
+                for i in options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]:
                     fmt += "s"
                 wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 for i in wanted_opt_set:
@@ -390,15 +390,15 @@ class Dhcpd(app_manager.RyuApp):
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
             if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
                 option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
-                                               addrconv.ipv4.text_to_bin(self.subnet),
+                                               addrconv.ipv4.text_to_bin(self.subnet.toStr()),
                                                length=4))
             if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
                 option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.router_addr),
+                                               addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
                                                length=4))
             if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
                 option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.dns_addr),
+                                               addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
                                                length=4))
             option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
                                            chr(self.lease_time),
@@ -440,7 +440,7 @@ class Dhcpd(app_manager.RyuApp):
             wanted_opts = list()
             if dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT in options:
                 fmt = ""
-                for i in len(options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]):
+                for i in options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT]:
                     fmt += "s"
                 wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 for i in wanted_opt_set:
@@ -450,15 +450,15 @@ class Dhcpd(app_manager.RyuApp):
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
             if dhcp.DHCP_SUBNET_MASK_OPT in wanted_opts:
                 option_list.append(dhcp.option(dhcp.DHCP_SUBNET_MASK_OPT,
-                                               addrconv.ipv4.text_to_bin(self.subnet),
+                                               addrconv.ipv4.text_to_bin(self.subnet.toStr()),
                                                length=4))
             if dhcp.DHCP_GATEWAY_ADDR_OPT in wanted_opts and self.router_addr is not None:
                 option_list.append(dhcp.option(dhcp.DHCP_GATEWAY_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.router_addr),
+                                               addrconv.ipv4.text_to_bin(self.router_addr.toStr()),
                                                length=4))
             if dhcp.DHCP_DNS_SERVER_ADDR_OPT in wanted_opts and self.dns_addr is not None:
                 option_list.append(dhcp.option(dhcp.DHCP_DNS_SERVER_ADDR_OPT,
-                                               addrconv.ipv4.text_to_bin(self.dns_addr),
+                                               addrconv.ipv4.text_to_bin(self.dns_addr.toStr()),
                                                length=4))
             option_list.append(dhcp.option(dhcp.DHCP_IP_ADDR_LEASE_TIME_OPT,
                                            chr(self.lease_time),
