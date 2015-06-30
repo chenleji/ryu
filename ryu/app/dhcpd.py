@@ -371,7 +371,7 @@ class Dhcpd(app_manager.RyuApp):
 
                     offer = pool[0]
                     if dhcp.DHCP_REQUESTED_IP_ADDR_OPT in options:
-                        wanted_ip = options[dhcp.DHCP_REQUESTED_IP_ADDR_OPT].value
+                        wanted_ip = addrconv.ipv4.bin_to_text(options[dhcp.DHCP_REQUESTED_IP_ADDR_OPT].value)
                         if wanted_ip in pool:
                             offer = wanted_ip
                     pool.remove(offer)
@@ -409,7 +409,7 @@ class Dhcpd(app_manager.RyuApp):
             msg_type = dhcp.DHCP_OFFER
             if dhcp.DHCP_REQUESTED_IP_ADDR_OPT not in options:
                 return
-            wanted_ip = options[dhcp.DHCP_REQUESTED_IP_ADDR_OPT]
+            wanted_ip = addrconv.ipv4.bin_to_text(options[dhcp.DHCP_REQUESTED_IP_ADDR_OPT])
             got_ip = None
             if src in self.leases:
                 if wanted_ip != self.leases[src]:
