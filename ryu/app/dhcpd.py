@@ -209,8 +209,6 @@ class SimpleAddressPool(AddressPool):
 
 
 class Dhcpd(app_manager.RyuApp):
-    _DHCP_CLIENT_PORT = 68
-    _DHCP_SERVER_PORT = 67
     _MSG_TYPE_BOOT_REPLY = 2
     _MSG_TYPE_BOOT_REQ = 1
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
@@ -256,12 +254,9 @@ class Dhcpd(app_manager.RyuApp):
             # core.openflow.addListeners(self)
 
     def _get_pool(self):
-        """
-        Get an IP pool.  Return None to not issue an IP.  You should probably log this.
-        """
         return self.pool
 
-    def add_flow(self, datapath):
+    def add_dhcp_flow(self, datapath):
         ofproto = datapath.ofproto
         match = datapath.ofproto_parser.OFPMatch(eth_type=ether.ETH_TYPE_IP,
                                                  ip_proto=inet.IPPROTO_UDP,
@@ -385,7 +380,6 @@ class Dhcpd(app_manager.RyuApp):
                 wanted_opt_set = struct.unpack(fmt, options[dhcp.DHCP_PARAMETER_REQUEST_LIST_OPT])
                 for i in wanted_opt_set:
                     wanted_opts.append(ord(i))
-            # DHCP options tag code
             option_list = list()
             option_list.append(dhcp.option(dhcp.DHCP_MESSAGE_TYPE_OPT, chr(msg_type), length=1))
             if msg_type is not dhcp.DHCP_NAK:
