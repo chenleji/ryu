@@ -407,8 +407,8 @@ class Dhcpd(app_manager.RyuApp):
             option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
             resp_options = dhcp.options(option_list=option_list)
             pkt.add_protocol(dhcp.dhcp(op=self._MSG_TYPE_BOOT_REPLY, chaddr=pkt_dhcp.chaddr, options=resp_options,
-                                       xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=offer, siaddr=self.ip_addr,
-                                       giaddr='0.0.0.0', sname='', boot_file=''))
+                                       xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=offer.toStr(),
+                                       siaddr=self.ip_addr.toStr(), giaddr='0.0.0.0', sname='', boot_file=''))
 
         # REQUEST MSG
         if dhcp_msg_type == dhcp.DHCP_REQUEST:
@@ -467,12 +467,12 @@ class Dhcpd(app_manager.RyuApp):
             option_list.append(dhcp.option(dhcp.DHCP_REBINDING_TIME_OPT, chr(self.lease_time * 7 / 8), length=4))
             resp_options = dhcp.options(option_list=option_list)
             pkt.add_protocol(dhcp.dhcp(op=self._MSG_TYPE_BOOT_REPLY, chaddr=pkt_dhcp.chaddr, options=resp_options,
-                                       xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=wanted_ip, siaddr=self.ip_addr,
-                                       giaddr='0.0.0.0', sname='', boot_file=''))
+                                       xid=pkt_dhcp.xid, ciaddr=pkt_dhcp.ciaddr, yiaddr=wanted_ip.toStr(),
+                                       siaddr=self.ip_addr.toStr(), giaddr='0.0.0.0', sname='', boot_file=''))
 
         # RELEASE MSG
         if dhcp_msg_type == dhcp.DHCP_RELEASE:
-            if self.leases.get(src) != pkt_dhcp.ciaddr:
+            if self.leases.get(src).toStr() != pkt_dhcp.ciaddr:
                 LOG.warn("%s tried to release unleased %s" % (src, pkt_dhcp.ciaddr))
                 return
             del self.leases[src]
