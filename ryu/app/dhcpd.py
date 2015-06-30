@@ -355,7 +355,8 @@ class Dhcpd(app_manager.RyuApp):
         pkt.add_protocol(udp.udp(src_port=pkt_udp.dst_port, dst_port=pkt_udp.src_port))
 
         # DISCOVER MSG
-        if options[dhcp.DHCP_MESSAGE_TYPE_OPT] == dhcp.DHCP_DISCOVER:
+        dhcp_msg_type = ord(options[dhcp.DHCP_MESSAGE_TYPE_OPT])
+        if dhcp_msg_type == dhcp.DHCP_DISCOVER:
             msg_type = dhcp.DHCP_OFFER
             if src in self.leases:
                 offer = self.leases[src]
@@ -404,7 +405,7 @@ class Dhcpd(app_manager.RyuApp):
                                        giaddr='0.0.0.0', sname='', boot_file=''))
 
         # REQUEST MSG
-        if options[dhcp.DHCP_MESSAGE_TYPE_OPT] == dhcp.DHCP_REQUEST:
+        if dhcp_msg_type == dhcp.DHCP_REQUEST:
             msg_type = dhcp.DHCP_OFFER
             if dhcp.DHCP_REQUESTED_IP_ADDR_OPT not in options:
                 return
@@ -459,7 +460,7 @@ class Dhcpd(app_manager.RyuApp):
                                        giaddr='0.0.0.0', sname='', boot_file=''))
 
         # RELEASE MSG
-        if options[dhcp.DHCP_MESSAGE_TYPE_OPT] == dhcp.DHCP_RELEASE:
+        if dhcp_msg_type == dhcp.DHCP_RELEASE:
             if self.leases.get(src) != pkt_dhcp.ciaddr:
                 LOG.warn("%s tried to release unleased %s" % (src, pkt_dhcp.ciaddr))
                 return
